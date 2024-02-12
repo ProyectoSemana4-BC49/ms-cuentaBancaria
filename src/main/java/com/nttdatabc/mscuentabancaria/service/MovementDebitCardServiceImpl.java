@@ -6,9 +6,9 @@ import static com.nttdatabc.mscuentabancaria.utils.MovementDebitCardValidator.va
 import static com.nttdatabc.mscuentabancaria.utils.MovementDebitCardValidator.validateMovementDebitCardNoNulls;
 import static com.nttdatabc.mscuentabancaria.utils.Utilitarios.generateUuid;
 
-import com.nttdatabc.mscuentabancaria.model.helpers.AccountsSecundary;
 import com.nttdatabc.mscuentabancaria.model.MovementDebitCard;
 import com.nttdatabc.mscuentabancaria.model.enums.TypeMovementDebitCard;
+import com.nttdatabc.mscuentabancaria.model.helpers.AccountsSecundary;
 import com.nttdatabc.mscuentabancaria.repository.MovementDebitCardRepository;
 import com.nttdatabc.mscuentabancaria.service.interfaces.MovementDebitCardService;
 import com.nttdatabc.mscuentabancaria.utils.exceptions.errors.ErrorResponseException;

@@ -6,21 +6,18 @@ import static com.nttdatabc.mscuentabancaria.utils.Utilitarios.*;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.netflix.discovery.converters.Auto;
 import com.nttdatabc.mscuentabancaria.config.kafka.KafkaConsumerListener;
-import com.nttdatabc.mscuentabancaria.model.helpers.AccountsSecundary;
 import com.nttdatabc.mscuentabancaria.model.DebitCard;
+import com.nttdatabc.mscuentabancaria.model.helpers.AccountsSecundary;
 import com.nttdatabc.mscuentabancaria.repository.AccountRepository;
 import com.nttdatabc.mscuentabancaria.repository.DebitCardRepository;
 import com.nttdatabc.mscuentabancaria.service.interfaces.DebitCardService;
 import com.nttdatabc.mscuentabancaria.utils.DebitCardValidator;
 import com.nttdatabc.mscuentabancaria.utils.exceptions.errors.ErrorResponseException;
-
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -59,7 +56,7 @@ public class DebitCardServiceImpl implements DebitCardService {
   public Flux<DebitCard> getAllDebitCardService() {
     String cacheKey = "carddebt";
     Duration cacheDuration = Duration.ofSeconds(50);
-    return redisTemplate.opsForList().range(cacheKey,0, -1)
+    return redisTemplate.opsForList().range(cacheKey, 0, -1)
         .switchIfEmpty(
             debitCardRepository.findAll()
                 .flatMap(debitCard -> redisTemplate.opsForList().leftPushAll(cacheKey, debitCard)
@@ -115,7 +112,8 @@ public class DebitCardServiceImpl implements DebitCardService {
   @Override
   public Mono<DebitCard> getDebitCardByIdService(String debitCardId) {
     return debitCardRepository.findById(debitCardId)
-        .switchIfEmpty(Mono.error(new ErrorResponseException(EX_NOT_FOUND_RECURSO, HttpStatus.NOT_FOUND.value(), HttpStatus.NOT_FOUND)));
+        .switchIfEmpty(Mono.error(new ErrorResponseException(EX_NOT_FOUND_RECURSO,
+            HttpStatus.NOT_FOUND.value(), HttpStatus.NOT_FOUND)));
   }
 
   @Override
@@ -125,7 +123,7 @@ public class DebitCardServiceImpl implements DebitCardService {
         .then(getDebitCardByIdService(debitCard.get_id())
             .flatMap(existingDebitCard -> {
               Flux<AccountsSecundary> accountsFlux = Flux.fromIterable(debitCard.getAccountsSecundary());
-              Mono<DebitCard> accountFlux = accountsFlux.flatMap(accountsSecundary -> accountService.getAccountByIdService(accountsSecundary.getAccountId()))
+              return accountsFlux.flatMap(accountsSecundary -> accountService.getAccountByIdService(accountsSecundary.getAccountId()))
                   .collectList()
                   .flatMap(accounts -> {
                     boolean allCustomersExist = accounts.stream()
@@ -139,16 +137,17 @@ public class DebitCardServiceImpl implements DebitCardService {
                     existingDebitCard.setAccountsSecundary(combinedList);
                     return debitCardRepository.save(existingDebitCard);
                   });
-
-              return accountFlux;
             })
         )
         .then();
   }
+
+
   @KafkaListener(topics = {"verify-carddeb-exist"}, groupId = "my-group-id")
-  public void listenerVerifyCustomerCredit(String message){
+  public void listenerVerifyCustomerCredit(String message) {
     Gson gson = new Gson();
-    Map<String, String> map = gson.fromJson(message, new TypeToken<Map<String, String>>(){}.getType());
+    Map<String, String> map = gson.fromJson(message, new TypeToken<Map<String, String>>() {
+    }.getType());
     String cardDebitAssociate = map.get("cardDebitAssociate");
 
     Mono<DebitCard> getDebitCard = getDebitCardByIdService(cardDebitAssociate);
@@ -169,9 +168,10 @@ public class DebitCardServiceImpl implements DebitCardService {
   }
 
   @KafkaListener(topics = {"update-amount-carddeb"}, groupId = "my-group-id")
-  public void listenerUpdateAmountCardDeb(String message){
+  public void listenerUpdateAmountCardDeb(String message) {
     Gson gson = new Gson();
-    Map<String, String> map = gson.fromJson(message, new TypeToken<Map<String, String>>(){}.getType());
+    Map<String, String> map = gson.fromJson(message, new TypeToken<Map<String, String>>() {
+    }.getType());
     String cardDebitAssociate = map.get("cardDebitId");
     String type = map.get("type");
     Double amountUpdate = Double.parseDouble(map.get("mount"));
@@ -180,19 +180,21 @@ public class DebitCardServiceImpl implements DebitCardService {
           String accountPrincipalId = debitCard.getAccountIdPrincipal();
           return accountRepository.findById(accountPrincipalId)
               .flatMap(account -> {
-                if(type.equals("increase")){
+                if (type.equals("increase")) {
                   account.setCurrentBalance(account.getCurrentBalance().add(BigDecimal.valueOf(amountUpdate)));
-                }else{
+                } else {
                   account.setCurrentBalance(account.getCurrentBalance().subtract(BigDecimal.valueOf(amountUpdate)));
                 }
                 return accountRepository.save(account);
               });
         }).subscribe();
   }
+
   @KafkaListener(topics = {"verify-balance-carddeb"}, groupId = "my-group-id")
-  public void listenerVerifyBalanceCardDeb(String message){
+  public void listenerVerifyBalanceCardDeb(String message) {
     Gson gson = new Gson();
-    Map<String, String> map = gson.fromJson(message, new TypeToken<Map<String, String>>(){}.getType());
+    Map<String, String> map = gson.fromJson(message, new TypeToken<Map<String, String>>() {
+    }.getType());
     String cardDebitAssociate = map.get("cardDebitId");
     Double amountUpdate = Double.parseDouble(map.get("mount"));
 
@@ -202,9 +204,9 @@ public class DebitCardServiceImpl implements DebitCardService {
           return accountRepository.findById(accountPrincipalId)
               .flatMap(account -> {
                 Map<String, String> requestResponseVerifyBalance = new HashMap<>();
-                if(account.getCurrentBalance().doubleValue() >= amountUpdate){
+                if (account.getCurrentBalance().doubleValue() >= amountUpdate) {
                   requestResponseVerifyBalance.put("response", "ok");
-                }else{
+                } else {
                   requestResponseVerifyBalance.put("response", "error");
                 }
                 kafkaTemplate.send("response-verify-balance-carddeb", gson.toJson(requestResponseVerifyBalance));

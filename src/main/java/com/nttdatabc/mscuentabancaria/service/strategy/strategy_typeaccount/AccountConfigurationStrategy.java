@@ -2,7 +2,6 @@ package com.nttdatabc.mscuentabancaria.service.strategy.strategy_typeaccount;
 
 
 import static com.nttdatabc.mscuentabancaria.utils.Constantes.*;
-import static com.nttdatabc.mscuentabancaria.utils.Utilitarios.convertStrToCustomerExt;
 
 import com.google.gson.Gson;
 import com.nttdatabc.mscuentabancaria.config.kafka.KafkaConsumerListener;
@@ -10,29 +9,29 @@ import com.nttdatabc.mscuentabancaria.model.Account;
 import com.nttdatabc.mscuentabancaria.model.enums.TypeAccountBank;
 import com.nttdatabc.mscuentabancaria.model.response.CustomerExt;
 import com.nttdatabc.mscuentabancaria.utils.exceptions.errors.ErrorResponseException;
+import java.util.HashMap;
+import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.kafka.core.KafkaTemplate;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**
  * Configura la cuenta según la estrategia específica implementada.
  */
 public interface AccountConfigurationStrategy {
-  Mono<Void> configureAccount(Account account, CustomerExt customerExt) ;
+  Mono<Void> configureAccount(Account account, CustomerExt customerExt);
 
   /**
    * Validate has credit.
    *
    * @param kafkaConsumerListener service.
-   * @param customerId id acccount.
+   * @param customerId            id acccount.
    * @throws ErrorResponseException error.
    */
-  default Mono<Void> validateHasCredit(KafkaConsumerListener kafkaConsumerListener, String customerId, KafkaTemplate<String, String> kafkaTemplate)  {
+  default Mono<Void> validateHasCredit(KafkaConsumerListener kafkaConsumerListener, String customerId, KafkaTemplate<String, String> kafkaTemplate) {
     Map<String, String> request = new HashMap<>();
     request.put("customerId", customerId);
     Gson gson = new Gson();

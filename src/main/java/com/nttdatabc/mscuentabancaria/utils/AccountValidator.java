@@ -4,23 +4,19 @@ import static com.nttdatabc.mscuentabancaria.utils.Constantes.*;
 import static com.nttdatabc.mscuentabancaria.utils.Utilitarios.convertStrToCustomerExt;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.nttdatabc.mscuentabancaria.config.kafka.KafkaConsumerListener;
 import com.nttdatabc.mscuentabancaria.model.Account;
 import com.nttdatabc.mscuentabancaria.model.enums.TypeAccountBank;
 import com.nttdatabc.mscuentabancaria.model.response.CustomerExt;
 import com.nttdatabc.mscuentabancaria.utils.exceptions.errors.ErrorResponseException;
+import java.util.HashMap;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.MonoProcessor;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -103,7 +99,7 @@ public class AccountValidator {
   /**
    * Verifica la existencia de un cliente mediante su ID.
    *
-   * @param customerId         El ID del cliente.
+   * @param customerId El ID del cliente.
    * @return La información del cliente si existe.
    * @throws ErrorResponseException Si el cliente no existe.
    */
@@ -127,7 +123,7 @@ public class AccountValidator {
         });
   }
 
-  public  Mono<Void> verifyCustomerDebCredit(String customerId, KafkaConsumerListener kafkaConsumerListener) {
+  public Mono<Void> verifyCustomerDebCredit(String customerId, KafkaConsumerListener kafkaConsumerListener) {
     Map<String, String> request = new HashMap<>();
     request.put("customerId", customerId);
     Gson gson = new Gson();

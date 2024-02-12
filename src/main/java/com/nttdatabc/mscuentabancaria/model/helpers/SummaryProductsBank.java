@@ -1,9 +1,9 @@
 package com.nttdatabc.mscuentabancaria.model.helpers;
 
-import java.util.List;
 
 import com.nttdatabc.mscuentabancaria.model.Account;
 import com.nttdatabc.mscuentabancaria.model.response.CreditExtDto;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,5 +19,5 @@ import lombok.Setter;
 public class SummaryProductsBank {
   private String custormerId;
   private List<Account> accountsBanks;
-  private List<CreditExtDto>creditsBanks;
+  private List<CreditExtDto> creditsBanks;
 }

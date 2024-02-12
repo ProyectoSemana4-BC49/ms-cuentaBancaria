@@ -1,12 +1,10 @@
 package com.nttdatabc.mscuentabancaria.utils;
 
-import com.google.gson.Gson;
-import com.nttdatabc.mscuentabancaria.model.response.CustomerExt;
-import org.checkerframework.checker.units.qual.C;
-
 import static com.nttdatabc.mscuentabancaria.utils.Constantes.DURATION_EXPIRED_DEBIT_CARD;
 import static com.nttdatabc.mscuentabancaria.utils.Constantes.PREFIX_NUMBER_CARD;
 
+import com.google.gson.Gson;
+import com.nttdatabc.mscuentabancaria.model.response.CustomerExt;
 import java.time.LocalDate;
 import java.util.Random;
 import java.util.UUID;
@@ -48,7 +46,7 @@ public class Utilitarios {
     return String.format("%02d/%s", month, String.valueOf(year).substring(2));
   }
 
-  public static CustomerExt convertStrToCustomerExt(String response){
+  public static CustomerExt convertStrToCustomerExt(String response) {
     Gson gson = new Gson();
     return gson.fromJson(response, CustomerExt.class);
   }

@@ -9,14 +9,14 @@ import com.nttdatabc.mscuentabancaria.model.DebitCard;
 import com.nttdatabc.mscuentabancaria.model.response.CustomerExt;
 import com.nttdatabc.mscuentabancaria.repository.DebitCardRepository;
 import com.nttdatabc.mscuentabancaria.utils.exceptions.errors.ErrorResponseException;
+import java.util.HashMap;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Clase debitCardValidator.
@@ -25,6 +25,7 @@ import java.util.Map;
 public class DebitCardValidator {
   @Autowired
   private KafkaTemplate<String, String> kafkaTemplate;
+
   public static Mono<Void> validateDebitCardNoNulls(DebitCard debitCard) {
     return Mono.just(debitCard)
         .filter(c -> c.getCustomerId() != null)
@@ -80,7 +81,7 @@ public class DebitCardValidator {
         });
   }
 
-  public  Mono<Void> verifyCustomerDebCredit(String customerId, KafkaConsumerListener kafkaConsumerListener) {
+  public Mono<Void> verifyCustomerDebCredit(String customerId, KafkaConsumerListener kafkaConsumerListener) {
     Map<String, String> request = new HashMap<>();
     request.put("customerId", customerId);
     Gson gson = new Gson();

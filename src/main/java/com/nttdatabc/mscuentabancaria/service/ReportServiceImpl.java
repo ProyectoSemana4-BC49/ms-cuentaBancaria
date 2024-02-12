@@ -13,12 +13,11 @@ import com.nttdatabc.mscuentabancaria.repository.AccountRepository;
 import com.nttdatabc.mscuentabancaria.repository.MovementDebitCardRepository;
 import com.nttdatabc.mscuentabancaria.repository.MovementRepository;
 import com.nttdatabc.mscuentabancaria.service.interfaces.ReportService;
+import com.nttdatabc.mscuentabancaria.utils.AccountValidator;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
-
-import com.nttdatabc.mscuentabancaria.utils.AccountValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -130,7 +129,7 @@ public class ReportServiceImpl implements ReportService {
         });
   }
 
-  public Flux<CreditExtDto> getCreditsByCustomer(String customerId){
+  public Flux<CreditExtDto> getCreditsByCustomer(String customerId) {
     Map<String, String> request = new HashMap<>();
     request.put("customerId", customerId);
     Gson gson = new Gson();
